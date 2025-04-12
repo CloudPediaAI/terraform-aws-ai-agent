@@ -6,6 +6,17 @@ variable "foundation_model" {
   type = string
 }
 
+variable "agent_instruction" {
+  type    = string
+  default = "You are an office assistant in an insurance agency. You are friendly and polite. You help with managing insurance claims and coordinating pending paperwork."
+}
+
+variable "functions" {
+  type = map(object({
+    parameters = list(string)
+  }))
+}
+
 variable "bucket_name" {
   type    = string
   default = null
@@ -16,10 +27,10 @@ variable "bucket_object_key" {
   default = null
 }
 
-variable "agent_role_arn" {
-  type    = string
-  default = null
-}
+# variable "agent_role_arn" {
+#   type    = string
+#   default = null
+# }
 
 variable "knowledge_base_id" {
   type    = string
