@@ -28,4 +28,13 @@ locals {
         require_confirmation = "DISABLED"
     }]
   ])
+
+  knowledge_bases = (var.knowledge_base_ids == null) ? [] : flatten([
+    for kbid in var.knowledge_base_ids : [
+      {
+        description          = kbid
+        knowledge_base_id    = kbid
+        knowledge_base_state = "ENABLED"
+    }]
+  ])
 }
