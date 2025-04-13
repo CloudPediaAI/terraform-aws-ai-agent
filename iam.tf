@@ -12,6 +12,35 @@ data "aws_iam_policy_document" "agent_invoke" {
   }
 }
 
+data "aws_iam_policy_document" "kb_retrieve" {
+  statement {
+    sid    = "AmazonBedrockAgentKBRetrievePolicy"
+    effect = "Allow"
+    actions = [
+      "bedrock:Retrieve"
+    ]
+    resources = flatten([
+      for kbid in var.knowledge_base_ids : [
+        "arn:aws:bedrock:${data.aws_region.default.name}:${data.aws_caller_identity.current.account_id}:knowledge-base/${kbid}"
+        # "arn:aws:bedrock:${data.aws_region.default.name}::foundation-model/${var.foundation_model}"
+      ]
+    ])
+  }
+}
+
+locals {
+  policies_for_agent_role = flatten([
+    {
+      policy_name     = "${var.agent_name}-bedrock-agent-invoke-policy"
+      policy_document = data.aws_iam_policy_document.agent_invoke.json
+    },
+    length(local.knowledge_bases) < 1 ? [] : [{
+      policy_name     = "${var.agent_name}-bedrock-kb-retrieve-policy"
+      policy_document = data.aws_iam_policy_document.kb_retrieve.json
+    }]
+  ])
+}
+
 resource "awscc_iam_role" "bedrock_agent" {
   role_name   = "${var.agent_name}-bedrock-agent-execution-role"
   description = "This role is to execute Bedrock Agent - ${var.agent_name}"
@@ -38,8 +67,9 @@ resource "awscc_iam_role" "bedrock_agent" {
       },
     ]
   })
-  policies = [{
-    policy_name     = "${var.agent_name}-bedrock-agent-invoke-policy"
-    policy_document = data.aws_iam_policy_document.agent_invoke.json
-  }]
+  
+  policies = local.policies_for_agent_role
+
+  # tags = var.tags
+
 }

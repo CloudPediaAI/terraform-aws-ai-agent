@@ -5,15 +5,8 @@ resource "awscc_bedrock_agent" "agent" {
   agent_resource_role_arn = awscc_iam_role.bedrock_agent.arn
   foundation_model        = var.foundation_model
   instruction             = var.agent_instruction
-  # knowledge_bases         = (length(local.knowledge_bases) > 0) ? local.knowledge_bases : null
-  knowledge_bases = local.knowledge_bases
-  # knowledge_bases = [{
-  #   description          = "example knowledge base"
-  #   knowledge_base_id    = var.knowledge_base_id
-  #   knowledge_base_state = "ENABLED"
-  # }]
+  knowledge_bases         = local.knowledge_bases
 
-  # customer_encryption_key_arn = var.kms_key_arn
   idle_session_ttl_in_seconds = var.idle_session_timeout
   auto_prepare                = true
 
@@ -28,17 +21,6 @@ resource "awscc_bedrock_agent" "agent" {
     # }
     function_schema = {
       functions = local.functions_for_action
-      # functions = [{
-      #   name        = "function1"
-      #   description = "function1"
-      #   parameters = {
-      #     seller_id = {
-      #       description = "test"
-      #       type        = "string"
-      #     }
-      #   }
-      #   require_confirmation = "DISABLED"
-      # }]
     }
     action_group_executor = {
       lambda = var.lambda_arn

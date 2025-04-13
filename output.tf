@@ -12,4 +12,3 @@ output "iam_role_arn" {
 #   value       = local.api_endpoints
 #   description = "List of API endpoints created to Invoke AI Agent"
 # }
-
