@@ -19,11 +19,11 @@ data "aws_iam_policy_document" "kb_retrieve" {
     actions = [
       "bedrock:Retrieve"
     ]
-    resources = flatten([
-      for kbid in var.knowledge_base_ids : [
-        "arn:aws:bedrock:${data.aws_region.default.name}:${data.aws_caller_identity.current.account_id}:knowledge-base/${kbid}"
-        # "arn:aws:bedrock:${data.aws_region.default.name}::foundation-model/${var.foundation_model}"
-      ]
+    resources = flatten(
+      length(local.knowledge_bases) < 1 ? [] : [
+        for kbid in var.knowledge_base_ids : [
+          "arn:aws:bedrock:${data.aws_region.default.name}:${data.aws_caller_identity.current.account_id}:knowledge-base/${kbid}"
+        ]
     ])
   }
 }
@@ -67,7 +67,7 @@ resource "awscc_iam_role" "bedrock_agent" {
       },
     ]
   })
-  
+
   policies = local.policies_for_agent_role
 
   # tags = var.tags
